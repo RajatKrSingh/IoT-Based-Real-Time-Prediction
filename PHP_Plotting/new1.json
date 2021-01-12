@@ -1,0 +1,6 @@
+{
+  "cols":[
+    {"id":"","label":"Timestamp","type":"string"},
+    {"id":"","label":"Sensor_Data","type":"number"},
+  ],
+  "rows":[

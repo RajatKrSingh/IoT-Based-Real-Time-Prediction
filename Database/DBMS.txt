@@ -1,0 +1,85 @@
+create table SENSOR  (
+	SENSOR_ID varchar(3),
+	ORIGINAL_WAVE varchar(50) not null,
+	SAMPLING_FREQUENCY numeric(10,8) not null,
+	NAME_SENSOR varchar(20),
+	primary key(SENSOR_ID)
+	);
+
+create table SENSOR_DATA  (
+	SENSOR_ID varchar(3),
+	RECEIVE_TIME timestamp(2) default CURRENT_TIMESTAMP,
+	DATA_RECEIVED numeric(10,5),
+	primary key ( SENSOR_ID , RECEIVE_TIME),
+	foreign key(SENSOR_ID) references SENSOR   );
+
+create table NOISE  (
+	SENSOR_ID varchar(3),
+	NOISE_ID varchar(3),
+	NOISE_TYPE varchar(10),
+	NOISE_DESCRIPTION varchar(100),
+	foreign key ( SENSOR_ID ) references SENSOR,
+	primary key(SENSOR_ID,NOISE_ID)  );
+---------------------------------------------------------------------------------------
+Sensor: check(SAMPLING_FREQUENCY >0 ) 
+
+Noise:  check (NOISE_TYPE in ('ADDER','MULTIPLIER')),
+	check NOISE_ID in ( 'N01' , 'N02' , 'N03' , 'N04');
+
+
+create trigger trig_sensor before insert on SENSOR
+for each row
+begin
+if new.SAMPLING_FREQUENCY < 0 then
+SET new.SAMPLING_FREQUENCY = 1;
+end
+//
+;
+
+---------------------------------------------------------------------------------------
+
+
+insert into SENSOR values ('S01' , 'F(x)' , '0.50' , 'Temperature Sensor' );
+
+insert into NOISE values ( 'S01' ,  'N01' , null , 'Sensor not transmitting data' );
+insert into NOISE values ( 'S01' ,  'N02' , 'ADDER' , 'Sensor transmitting data but  noise is present' );
+insert into NOISE values ( 'S01' ,  'N03' , 'MULTIPLIER' , 'Sensor not transmitting data but noise is present' );
+insert into NOISE values ( 'S01' ,  'N04' , null , 'Sensor transmitting data but a surge is present' );
+ 
+	
+insert into SENSOR_DATA values ('S01' ,  , 2.375);
+	
+
+----------------------------------------------------------------------------------------
+# Sent data to cloud
+cursor.execute("INSERT INTO SENSOR_DATA(SENSOR_ID,DATA_RECEIVED) values VALUES (%s,%s)", (currennt_sensor_id , current_sensor_value))
+  
+
+
+import MySQLdb
+
+#establish connection to MySQL. You'll have to change this for your database.
+
+dbConn = MySQLdb.connect("localhost","database_username","password","database_name") or die ("could not connect to database")
+
+# Alter code for multiple sensors
+
+current_sensor_value  = #floating point sensor data
+current_sensor_id =  #sensorid from which value received
+
+#open a cursor to the database
+cursor = dbConn.cursor()
+
+
+try:
+  cursor.execute("INSERT INTO SENSOR_DATA(SENSOR_ID,DATA_RECEIVED) values (%s,%s)", (current_sensor_id , current_sensor_value))
+  
+  dbConn.commit() 
+  cursor.close()  
+
+
+except MySQLdb.IntegrityError:
+  print "failed to insert data"
+
+finally:
+    cursor.close()  #close just incase it failed

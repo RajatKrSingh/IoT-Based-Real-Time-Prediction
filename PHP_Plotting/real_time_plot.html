@@ -1,0 +1,100 @@
+<?php 
+	$names = file('D:/final_out.txt');
+	echo end($names);
+	echo 'Hello this is Rajat';
+?>
+<html>
+  <head>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      
+      function drawChart() {
+        var data = $.ajax({
+          url: "getData.php",
+		  dataType: "json",
+		  async: false
+        }).responseText;
+
+		var data2 = $.ajax({
+          url: "getData1.php",
+		  dataType: "json",
+		  async: false
+        }).responseText;
+
+
+		var data3 = $.ajax({
+          url: "getData3.php",
+		  dataType: "json",
+		  async: false
+        }).responseText;
+
+		
+        var options3 = {
+          title: 'Sensor3 Readings',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+
+		
+		
+        var options2 = {
+          title: 'Sensor2 Readings',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+		var options = {
+          title: 'Sensor1 Readings',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+		
+		
+
+		var data1 = new google.visualization.DataTable(data);
+		var length = data1.getNumberOfRows();
+		if (length > 500)
+		{
+			data1.removeRows(0,length-500);
+		}
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+        chart.draw(data1, options);
+		
+
+		var data11 = new google.visualization.DataTable(data2);
+		var length = data11.getNumberOfRows();
+		if (length > 500)
+		{
+			data11.removeRows(0,length-500);
+		}
+        var chart1 = new google.visualization.LineChart(document.getElementById('curve_chart1'));
+
+        chart1.draw(data11, options2);
+		
+		
+		
+		var data31 = new google.visualization.DataTable(data3);
+		var length = data31.getNumberOfRows();
+		if (length > 500)
+		{
+			data31.removeRows(0,length-500);
+		}
+		var chart3 = new google.visualization.LineChart(document.getElementById('curve_chart3'));
+        chart3.draw(data31, options3);
+      }
+</script>
+</head>
+  <body>
+	<h1> hello</h1>
+	<?php echo 'Hello';?>
+    <div id="curve_chart" style="width: 1500px; height: 500px"></div>
+	<div id="curve_chart1" style="width: 1500px; height: 500px"></div>
+	<div id="curve_chart3" style="width: 1500px; height: 500px"></div>
+  </body>
+
+</html>
+
